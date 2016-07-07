@@ -23,25 +23,34 @@ juke.factory('StatsFactory', function ($q) {
 
 juke.controller('AlbumCtrl', function ($scope, $rootScope, $log, StatsFactory, AlbumFactory, PlayerFactory) {
 
-  AlbumFactory.fetchAll()
-  .then(function (albums) {
-    return AlbumFactory.fetchById(albums[0].id)
-  })
-  .then(function (album) {
-    album.imageUrl = '/api/albums/' + album.id + '/image';
-    album.songs.forEach(function (song, i) {
-      song.audioUrl = '/api/songs/' + song.id + '/audio';
-      song.albumIndex = i;
-    });
-    $scope.album = album;
+    $rootScope.$on('showAlbums', function() {
+      $scope.showAlbum = false
+    })
 
-    StatsFactory.totalTime(album)
-    .then(function (time) {
-      $scope.duration = Math.floor(time / 60) + " minutes";
-    });
-  })
-  .catch($log.error); // $log service can be turned on and off; also, pre-bound
+    $rootScope.$on('showAlbum', function(event, album) {
 
+      $scope.showAlbum = true
+
+      album.imageUrl = '/api/albums/' + album.id + '/image';
+      album.songs.forEach(function (song, i) {
+        song.audioUrl = '/api/songs/' + song.id + '/audio';
+        song.albumIndex = i;
+      });
+
+      $scope.album = album;
+
+      StatsFactory.totalTime(album)
+      .then(function (time) {
+        $scope.duration = Math.floor(time / 60) + " minutes";
+      });
+
+      $rootScope.$on()
+
+    })
+
+    $rootScope.$on('showAllArtists', function () {
+      $scope.showAlbum = false;
+    })
 
   // main toggle
   $scope.toggle = function(song, songList) {
