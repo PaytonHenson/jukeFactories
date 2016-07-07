@@ -8,6 +8,7 @@
     <script src="/angular/angular.js" defer></script>
     <script src="/js/module.js" defer></script>
     <script src="/js/album/album.controllers.js" defer></script>
+    <script src="/js/album/albums.controller.js" defer></script>
     <script src="/js/player/player.controller.js" defer></script>
     <script src="/js/player/player.factory.js" defer></script>
   </head>
@@ -26,9 +27,9 @@
       </div>
 
       <div class="col-xs-10">
-        <div class="album" ng-controller="AlbumCtrl">
+        <div ng-show="true" class="album" ng-controller="AlbumCtrl" >
           <p>
-            <h3>{{ album.name }}</h3>
+            <h3>{{ album.name }} {{ duration }}</h3>
             <img ng-src="{{ album.imageUrl }}" class="img-thumbnail">
           </p>
           <table class='table'>
@@ -41,10 +42,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr ng-repeat="song in album.songs" ng-class="{active: song === currentSong}">
+              <tr ng-repeat="song in album.songs" ng-class="{active: isCurrentSong(song)}">
                 <td>
-                  <button class="btn btn-default btn-xs" ng-click="toggle(song)">
-                    <span class="glyphicon" ng-class="{'glyphicon-pause': playing && song === currentSong, 'glyphicon-play': song !== currentSong || !playing}"></span>
+                  <button class="btn btn-default btn-xs" ng-click="toggle(song, album.songs)">
+                    <span class="glyphicon" ng-class="{'glyphicon-pause': isPlaying() && isCurrentSong(song), 'glyphicon-play': !isCurrentSong(song) || !isPlaying()}"></span>
                   </button>
                 </td>
                 <td>{{ song.name }}</td>
@@ -54,16 +55,34 @@
             </tbody>
           </table>
         </div>
+
+        <div ng-show="false" ng-controller="AlbumsCtrl" >
+          <h3>Albums</h3>
+          <div class="row" ng-repeat="album in albums">
+            <div class="col-xs-4">
+              <a class="thumbnail" href="#">
+                <img ng-src="{{album.imageUrl}}">
+                <div class="caption">
+                  <h5>
+                    <span>{{ album.name }}</span>
+                  </h5>
+                  <small>{{ album.songs.length }}</small>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
       </div>
 
-      <footer>
-        <div ng-show="currentSong" ng-controller="PlayerCtrl">
+      <footer ng-controller="PlayerCtrl">
+        <div ng-show="getCurrentSong()">
+        <!-- <p>{{currentSong()}}</p> -->
           <div class="pull-left">
             <button class="btn btn-default" ng-click="prev()">
               <span class="glyphicon glyphicon-step-backward"></span>
             </button>
-            <button class="btn btn-default" ng-click="toggle(currentSong)">
-              <span class="glyphicon" ng-class="{'glyphicon-pause': playing, 'glyphicon-play': !playing}"></span>
+            <button class="btn btn-default" ng-click="toggle(currentSong())">
+              <span class="glyphicon" ng-class="{'glyphicon-pause': isPlaying(), 'glyphicon-play': !isPlaying()}"></span>
             </button>
             <button class="btn btn-default" ng-click="next()">
               <span class="glyphicon glyphicon-step-forward"></span>
@@ -71,7 +90,7 @@
           </div>
           <div class="bar">
             <div class="progress" ng-click="handleProgressClick($event)">
-              <div class="progress-bar" ng-style="{width: progress + '%'}"></div>
+              <div class="progress-bar" ng-style="{width: progress() * 100 + '%'}"></div>
             </div>
           </div>
         </div>
